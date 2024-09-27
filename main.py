@@ -5,7 +5,6 @@ from GreyModel.efgm import EFGM
 from GreyModel.efgvm import EFGVM
 from GreyModel.gvm import *
 from GreyModel.gm import *
-from GreyForecasting.Grey_model_v2 import roll_gm11
 from GreyModel.tfgm import TFGM
 from GreyModel.tfgvm import TFGVM
 
@@ -32,12 +31,13 @@ df["price"] = df["price"].interpolate().ffill().bfill()
 X0 = np.array(df["price"])
 
 model_window = 5
-model = EFGM()
-model.fit(X0, window_size=model_window)
-print(model.get_arpe())
+for i in [GM(), EFGM(), TFGM(), GVM(), EFGVM(), TFGVM()]:
+    model = i
+    model.fit(X0, window_size=model_window)
+    print(model.get_arpe())
 
-df['price'] = df["price"][model_window:].reset_index(drop=True)
-plt.plot(df["price"], label="train")
-plt.plot(model.predicted, label="predicted")
-plt.legend()
-plt.show()
+# df['price'] = df["price"][model_window:].reset_index(drop=True)
+# plt.plot(df["price"], label="train")
+# plt.plot(model.predicted, label="predicted")
+# plt.legend()
+# plt.show()
