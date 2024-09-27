@@ -1,33 +1,43 @@
 import pandas as pd
 import numpy as np
-from GreyModel.gvm import GVM
+
+from GreyModel.efgm import EFGM
+from GreyModel.efgvm import EFGVM
+from GreyModel.gvm import *
+from GreyModel.gm import *
+from GreyForecasting.Grey_model_v2 import roll_gm11
+from GreyModel.tfgm import TFGM
+from GreyModel.tfgvm import TFGVM
 
 df = pd.read_csv("Us_Euro_parity_dataset.csv", index_col="Unnamed: 0")
 
-df.head()
-
 # filter dates as in paper
 
-df = df[(df["DATE"] > "2005-01-01") & (df["DATE"] < "2006-01-01")]
-
-
-df.info()
+df = df[(df["DATE"] >= "2006-01-01") & (df["DATE"] <= "2007-01-01")]
+df = df.reset_index(drop=True)
 
 
 # rename column
 df.rename(columns={"US dollar/Euro (EXR.D.USD.EUR.SP00.A)": "price"}, inplace=True)
 
 
-# # change in error is insignificant: either drop or fill
-df = df[~df["price"].isna()]
-# df["price"] = df["price"].interpolate().ffill().bfill()
+df["price"] = df["price"].interpolate().ffill().bfill()
 
-# # MAF
+# # UNCOMMENT FOR MAF
 # maf_window_size = 4
 # df["price"] = df["price"].rolling(window=maf_window_size).mean()
+# df = df[~df["price"].isna()]
+
 
 X0 = np.array(df["price"])
 
-model = GVM()
-model.fit(X0, window_size=5)
+model_window = 5
+model = EFGM()
+model.fit(X0, window_size=model_window)
 print(model.get_arpe())
+
+df['price'] = df["price"][model_window:].reset_index(drop=True)
+plt.plot(df["price"], label="train")
+plt.plot(model.predicted, label="predicted")
+plt.legend()
+plt.show()
