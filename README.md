@@ -1,6 +1,6 @@
-# GreyModel
+# Grey system theory-based models in time series prediction
 
-Code implementation for the paper
+Code implementation for the paper:
 
 https://www.sciencedirect.com/science/article/abs/pii/S0957417409007258
 
